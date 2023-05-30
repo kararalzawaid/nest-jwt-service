@@ -3,7 +3,8 @@ import {
   Controller,
   Get,
   Post,
-  Request
+  Request,
+  UseGuards
 } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
@@ -11,10 +12,14 @@ import { LoginDto } from './dto/login.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Public } from './decorators/public.decorator';
 
+import { RefreshTokenGuard } from './guards/refreshToken.guard';
+
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) { }
+  constructor(
+    private authService: AuthService
+  ) { }
 
   @Public()
   @Post('login')
@@ -26,5 +31,14 @@ export class AuthController {
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;
+  }
+
+  @Public()
+  @UseGuards(RefreshTokenGuard)
+  @Get('refresh')
+  refreshTokens(@Request() req) {
+    const { user } = req;
+
+    return this.authService.refreshTokens(user.sub, user.refreshToken);
   }
 }
