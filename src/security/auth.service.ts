@@ -3,6 +3,7 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
 import { decryptPassword } from './helpers/passwords';
+import { jwtConstants, jwtRefreshConstants } from './constants/auth';
 
 @Injectable()
 export class AuthService {
@@ -25,9 +26,45 @@ export class AuthService {
     if (originalPassword !== password) {
       throw new UnauthorizedException();
     }
-    const payload = { username: user.userName, sub: user._id };
-    return {
-      access_token: await this.jwtService.signAsync(payload)
+
+    return this.getTokens(user._id, userName);
+  }
+
+  private async getTokens(userId: string, username: string) {
+    const payload = { username, sub: userId };
+
+    const payloadCredentials = {
+      secret: jwtConstants.secret,
+      expiresIn: '1m',
     };
+
+    const refreshPayloadCredentials = {
+      secret: jwtRefreshConstants.secret,
+      expiresIn: '7d',
+    };
+
+    const token = await this.jwtService.signAsync(payload, payloadCredentials);
+    const refreshToken = await this.jwtService.signAsync(payload, refreshPayloadCredentials);
+
+    await this.usersService.update(userId, {
+      refreshToken: refreshToken,
+    });
+
+    return { token, refreshToken };
+  }
+
+  async refreshTokens(userId: string, refreshToken: string) {
+    const user = await this.usersService.findById(userId);
+
+    if (!user || !user.refreshToken)
+      throw new UnauthorizedException();
+
+    if (user.refreshToken !== refreshToken) {
+      throw new UnauthorizedException();
+    }
+
+    const tokens = await this.getTokens(user._id, user.userName);
+
+    return tokens;
   }
 }

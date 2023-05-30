@@ -27,6 +27,8 @@ async function bootstrap() {
     .setDescription('Test services')
     .setVersion('1.0')
     .addBearerAuth({ in: 'header', type: 'http' })
+    .addCookieAuth()
+    // .addR({ in: 'header', type: 'http' })
     .build();
 
   const document = SwaggerModule.createDocument(app, options);
