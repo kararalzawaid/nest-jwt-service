@@ -29,7 +29,6 @@ export class UsersService {
     const password_recovery_hash = encryptPassword(JSON.stringify({ validUntil }));
     const encryptedPassword = encryptPassword(registerDto.password);
 
-    console.log(password_recovery_hash);
     return new this.userModel({ ...registerDto, password_recovery_hash, password: encryptedPassword, refreshToken: randtoken.uid(256) }).save();
   }
 
