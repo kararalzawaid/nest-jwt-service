@@ -1,0 +1,48 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "target": "es2017",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "paths": {
+      "@common/*": [
+        "src/common/*"
+      ],
+      "@clients/*": [
+        "src/clients/*"
+      ],
+      "@orders/*": [
+        "src/orders/*"
+      ],
+      "@products/*": [
+        "src/products/*"
+      ],
+      "@data-lists/*": [
+        "src/data-lists/*"
+      ],
+      "@receipts/*": [
+        "src/receipts/*"
+      ],
+      "@dashboard/*": [
+        "src/dashboard/*"
+      ],
+      "@security/*": [
+        "src/security/*"
+      ],
+      "@cron/*": [
+        "src/cron/*"
+      ]
+    }
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}

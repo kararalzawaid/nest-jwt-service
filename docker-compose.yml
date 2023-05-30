@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  test_service:
+    container_name: test_service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: >
+      sh -c "yarn install &&
+        yarn start:debug"
+    env_file:
+      - .env
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+    environment:
+      wait_hosts: test_mongo:${MONGO_PORT}
+
+  test_mongo:
+    image: mongo:4.4.6
+    container_name: test_mongo
+    command: mongod --port ${MONGO_PORT}
+    env_file:
+      - .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
+    ports:
+      - ${MONGO_PORT}:${MONGO_PORT}
+    volumes:
+      - ./.docker/mongodb/data/db/:/data/db/
+      - ./.docker/mongodb/data/log/:/var/log/mongodb
+
+networks:
+  default:
+    name: ${DOCKER_NETWORK}
